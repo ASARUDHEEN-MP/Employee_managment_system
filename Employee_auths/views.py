@@ -38,12 +38,15 @@ class LoginView(APIView):
 
         if not email or not password:
             return Response({'error': 'Email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
-
+        
         # Authenticate the user
         user = authenticate(request, email=email, password=password)
 
         if user is None:
             return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        
+
 
         # Update last login timestamp
         user.last_login = timezone.now()
@@ -127,6 +130,15 @@ class PostionView(APIView):
 
 class EmployeeProfileImageUpload(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            profile = EmployeeProfile.objects.get(user=request.user)
+        except EmployeeProfile.DoesNotExist:
+            return Response({"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = EmployeeProfilePicSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
         try:
