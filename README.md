@@ -83,11 +83,20 @@ DB_PORT=5432
     python3 manage.py migrate
 
 ```
-7.Start the Server
+7.create super user
+```bash
+    python3 manage.py createsuperuser
+
+```
+
+8.Start the Server
 ```bash
     python3 manage.py runserver
 ```
 You can now access the API at http://127.0.0.1:8000/
+http://127.0.0.1:8000/api/** This for Employee side
+http://127.0.0.1:8000/api/admin/*** This for Admin side
+
 
 9.Testing
 ```bash
@@ -177,8 +186,19 @@ You can now access the API at http://127.0.0.1:8000/
         }
         ```
 
+**reqyest for access token when the access token expiery with valid refresh token**
 
-
+- **URL**: `http://127.0.0.1:8000/api/token/refresh/`
+- **Method**: `POST` 
+- **Request Body**:
+ - **Response**: 
+    - On successful login:
+        ```
+              {
+          "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMwODc3NDA0LCJpYXQiOjE3MzA2MTgxNjYsImp0aSI6ImYyYTU5YmJlMTRiYjRjNmZhMDQ1OWZjMjJiYWZmYjAwIiwidXNlcl9pZCI6MTV9.MXYlHWxSJyRWQ4zGoCrQbcpyBIygGuJjtLfpHhsKsoQ",
+          "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTczMDcwNDYwNCwiaWF0IjoxNzMwNjE4MjA0LCJqdGkiOiI0NjU1MDdkOWIyYzA0MmQyYTAzZThkMzg4NDdlNTJiOSIsInVzZXJfaWQiOjE1fQ.xtR-7wZP6XVCS36AQ2-SOG4LaFyQs5npGp-Lmx7XZhE"
+      }
+        ```
 **Update Employee Whwn regutser automatically the profile will create by signals**
 
 - **URL**: `http://127.0.0.1:8000/api/Employee/`
@@ -200,36 +220,37 @@ You can now access the API at http://127.0.0.1:8000/
         }
     ]
    }
-  
+
+  ```
 - **Response**: 
-    - On successful login:
+    - On successful :
         ```json
-              [
-          {
-              "id": 14,
-              "name": "test1",
-              "email": "test1@gmail.com",
-              "employeeprofile": {
-                  "id": 9,
-                  "position": 3,
-                  "position_title": "Managers"
-              },
-              "custom_fields": [
-                  {
-                      "custom_field_id": 4,
-                      "field_name": "phonenumber",
-                      "field_type": "number",
-                      "value": "702593282"
-                  },
-                  {
-                      "custom_field_id": 5,
-                      "field_name": "address",
-                      "field_type": "text",
-                      "value": ""
-                  }
-              ]
-          }
-]
+                             [
+                    {
+                        "id": 14,
+                        "name": "test1",
+                        "email": "test1@gmail.com",
+                        "employeeprofile": {
+                            "id": 9,
+                            "position": 3,
+                            "position_title": "Managers"
+                        },
+                        "custom_fields": [
+                            {
+                                "custom_field_id": 4,
+                                "field_name": "phonenumber",
+                                "field_type": "number",
+                                "value": "702593282"
+                            },
+                            {
+                                "custom_field_id": 5,
+                                "field_name": "address",
+                                "field_type": "text",
+                                "value": ""
+                            }
+                        ]
+                    }
+                ]
         ```
     - On error (e.g., validation errors if password or username is null):
         ```json
@@ -270,8 +291,7 @@ You can now access the API at http://127.0.0.1:8000/
       "user": 1,
       "name": "Alice Johnson",
       "email": "alice.johnson@example.com",
-      "phone_number": "9876543210",
-      "custom_fields": {}
+      
     }
   ]
 
@@ -344,4 +364,67 @@ You can now access the API at http://127.0.0.1:8000/
         "error": "Invalid custom field: \"name of that field\""
       }
   ```
+
+  ** CREATE GET custom_fields THIS WANT TO USE BY CONNECT TO THE Employee fields so if we need to connect to other table we can add to other Employee**
+
+- **URL**: `http://127.0.0.1:8000/api/admin/custom_fields/`
+  - **Method**: `get,post,put`
+- **Request Body**:
+  ```json
+  {
+          "field_name":"blaaa",
+          "field_type":"Number,text"
+          }
+
+ 
+- **Response**: 
+    - On successful login:
+        ```json
+       {
+        "field_name":"blaaa",
+        "field_type":"Number,text"
+        }
+  ```
+- **400 Bad Request**:
+  ```json
+       {
+        "error": "if there is the same field_name will back the error and admin can allow to create ""
+      }
+  ```
+
+
+
+   ** CREATE GET custom_fields_value connect the custom_fields with Employee with user custom_fields from custom_fields table value can be added by Employee**
+
+- **URL**: `http://127.0.0.1:8000/api/admin/custom_fields_value/`
+  - **Method**: `get,post,put,delete`
+- **Request Body**:
+  ```json
+     {
+            "user": 13,
+            "custom_field": 5,
+            "value": ""
+            
+        }
+ 
+- **Response**: 
+    - On successful login:
+        ```json
+            {
+          "user": 13,
+          "custom_field": 5,
+          "value": ""
+          
+      }
+
+  ```
+- **400 Bad Request**:
+  ```json
+       {
+        "error": "if Employee is the same field_name will back the error and admin can allow to create ""
+      }
+  ```
   
+
+  
+
